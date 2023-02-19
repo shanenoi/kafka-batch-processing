@@ -12,17 +12,14 @@ import (
 )
 
 func main() {
-	// Set up a signal handler to catch Ctrl+C and cleanly exit the program
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
-	// Set up a Kafka producer configuration
 	config := sarama.NewConfig()
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Retry.Max = 5
 	config.Producer.Return.Successes = true
 
-	// Connect to the Kafka brokers
 	brokers := strings.Split(os.Getenv("KAFKA_BROKERS"), ",")
 	producer, err := sarama.NewSyncProducer(brokers, config)
 	if err != nil {
@@ -34,15 +31,14 @@ func main() {
 		}
 	}()
 
-	// Send a message to the "ABC" topic every 30 seconds
-	xx := 0
+	idx := 0
 	for {
 		select {
 		case <-time.After(5 * time.Second):
 			for i := 0; i < 10; i++ {
 				message := &sarama.ProducerMessage{
 					Topic: os.Getenv("KAFKA_TOPIC"),
-					Value: sarama.StringEncoder(fmt.Sprintf("Hello %d, Kafka!", xx)),
+					Value: sarama.StringEncoder(fmt.Sprintf("Hello %d, Kafka!", idx)),
 				}
 				partition, offset, err := producer.SendMessage(message)
 				if err != nil {
@@ -50,7 +46,7 @@ func main() {
 				} else {
 					fmt.Printf("Message sent to partition %d at offset %d\n", partition, offset)
 				}
-				xx += 1
+				idx += 1
 			}
 		case sig := <-sigchan:
 			fmt.Printf("Caught signal %v: terminating\n", sig)

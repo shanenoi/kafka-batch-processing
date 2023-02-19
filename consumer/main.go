@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"kafka-batch-processing/lib"
 	"log"
 	"os"
 	"os/signal"
 	"strings"
 	"sync"
 	"time"
+
+	"kafka-batch-processing/lib"
 
 	"github.com/Shopify/sarama"
 )

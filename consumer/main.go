@@ -50,7 +50,7 @@ func main() {
 				break
 			}
 
-			if ringBuffer.Length() >= 10 {
+			if ringBuffer.Length() >= ringBufferSize/2 {
 				for {
 					msg, ok := ringBuffer.Dequeue()
 					if !ok {
